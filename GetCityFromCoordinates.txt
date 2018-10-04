@@ -1,0 +1,52 @@
+/**
+  * main() will be invoked when you Run This Action.
+  *
+  * When enabled as a Web Action, use the following URL to invoke this action:
+  * https://{APIHOST}/api/v1/web/{QUALIFIED ACTION NAME}?location=Austin
+  *
+  * For example:
+  * https://openwhisk.ng.bluemix.net/api/v1/web/myusername@us.ibm.com_myspace/get-resource/weather?location=Austin
+  *
+  * In this case, the params variable will look like:
+  *     { "location": "Austin" }
+  *
+  */
+
+const { promisify } = require('util');
+const request = promisify(require('request'));
+
+async function main(params) {
+var latitude = params.lat;
+var longtitude= params.long;
+  let response;
+  const url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng='+latitude+','+longtitude+'&key=AIzaSyDZXTUtjPpTJjPHKVFXeP51FtvEZBpj5ok'
+  try {
+    response = await request(url);
+      var pin_code=JSON.parse(response.body).results[0].address_components[7].long_name;
+      if(pin_code)
+      {
+          
+          
+      }
+  } catch (err) {
+    return Promise.reject({
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: { message: 'Error processing your request latitude=' + latitude +' url '+ url },
+    });
+  }
+  /** The response body contains temperature data in the following format
+   *    { code: '28',
+   *    date: 'Tue, 26 Dec 2017 12:00 PM EST',
+   *    temp: '18',
+   *    text: 'Mostly Cloudy' } }
+   */
+  
+  return {
+
+    body: pin_code
+   
+  };
+  
+}
+exports.main = main;
